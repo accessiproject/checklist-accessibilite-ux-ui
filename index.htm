@@ -3,13 +3,18 @@
 
 <head>
 	<title>Checklist UX-UI - web</title>
-	<meta charset="utf-8"> <!-- Layout stylesheet -->
+	<meta charset="utf-8"> 
 	<link rel="stylesheet" href="css/font/small.css" type="text/css" media="screen">
 	<link rel="stylesheet" href="css/style.css" type="text/css" media="screen">
-	<!-- Theme stylesheet -->
 	<link rel="stylesheet" id="currentCSS" href="css/themes/default.min.css" type="text/css" media="all">
 	<link rel="stylesheet" href="css/print.css" type="text/css" media="print">
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<script>
+		// Vérification de l'authentification
+		if (!sessionStorage.getItem('authenticated')) {
+			window.location.href = 'login.htm';
+		}
+	</script>
 	<script src="AccesSlide.js"></script>
 	<script src="lang/lang_fr.js"></script>
 	<script src="highlight/highlight.pack.js"></script>
@@ -330,7 +335,7 @@
 					<figure
 						aria-label='Dans cet exemple, une charte graphique alternative suffisamment contrastée est activable depuis un bouton "Augmenter le contraste".'
 						role="figure">
-						<img alt="Capture d'écran, navigation du site Dialogue et Solidarité, un bouton permet d'augmenter le contraste. "
+						<img alt="Capture d'écran d'un bouton permettant d'augmenter le contraste."
 							src="img_slide/contraste-03.jpg" />
 						<figcaption>
 							Dans cet exemple, une charte graphique alternative suffisamment contrastée est activable
@@ -350,7 +355,8 @@
 				</section>
 
 				<section class="slide">
-					<h2>						Assurer un contraste suffisant entre les éléments graphiques informatifs et interactifs
+					<h2>
+						Assurer un contraste suffisant entre les éléments graphiques informatifs et interactifs
 						avec leur arrière-plan
 						- Couleurs et contrastes
 					</h2>
@@ -863,7 +869,7 @@
 						<p style="font-size: 16px; color: #333; margin: 5px 0;"><strong
 								style="color: #2196F3;">📱</strong> 9.6</p>
 					</div>
-					<figure>
+					<figure role="figure">
 						<img alt="" src="img_slide/regroupement-champs-01.jpg" />
 						<figcaption>
 							Dans cet exemple, les champs sont regroupés en plusieurs zones : « Où et quand
@@ -889,7 +895,7 @@
 					<figure
 						aria-label="Dans cet exemple, les champs obligatoires sont annoncés par un astérisque dont la signification est annoncée au début du formulaire via une mention * champs obligatoires"
 						role="figure">
-						<img alt="Capture d'écran d'un formulaire, mention &quot;* champs obligatoires&quot; suivie de 3 champs &quot;Votre nom *&quot;, &quot;Votre prénom&quot;, &quot;Votre courriel *&quot;"
+						<img alt="Capture d'un formulaire, mention &quot;* champs obligatoires&quot; suivie de 3 champs &quot;Votre nom *&quot;, &quot;Votre prénom&quot;, &quot;Votre courriel *&quot;"
 							src="img_slide/champs-obligatoires-01.jpg" />
 						<figcaption>
 							Dans cet exemple, les champs obligatoires sont annoncés par un astérisque dont la
