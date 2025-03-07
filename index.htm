@@ -37,6 +37,21 @@
 		.lang-btn:focus {
 			background: #f2f2f2;
 		}
+		.logout-btn {
+			position: absolute;
+			top: 20px;
+			right: 20px;
+			padding: 8px 15px;
+			background: #f44336;
+			color: white;
+			border: none;
+			border-radius: 4px;
+			cursor: pointer;
+			font-size: 14px;
+		}
+		.logout-btn:hover {
+			background: #d32f2f;
+		}
 	</style>
 </head>
 
@@ -47,6 +62,7 @@
 
 		<header id="banner" role="banner" class="main-header clearfix">
 			<h1 class="main-title">Checklist UX-UI - Accessibilité</h1>
+			<button onclick="logout()" class="logout-btn">Se déconnecter</button>
 		</header>
 
 		<div id="nav" class="tool-bar footer-nav clearfix">
@@ -1403,6 +1419,12 @@
 		});
 
 
+	</script>
+	<script>
+		function logout() {
+			sessionStorage.removeItem('authenticated');
+			window.location.href = 'login.htm';
+		}
 	</script>
 </body>
 
