@@ -3,12 +3,45 @@
 
 <head>
 	<title>Checklist UX-UI - web</title>
-	<meta charset="utf-8"> 
+	<meta charset="utf-8">
 	<link rel="stylesheet" href="css/font/small.css" type="text/css" media="screen">
 	<link rel="stylesheet" href="css/style.css" type="text/css" media="screen">
 	<link rel="stylesheet" id="currentCSS" href="css/themes/default.min.css" type="text/css" media="all">
 	<link rel="stylesheet" href="css/print.css" type="text/css" media="print">
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.2.7/pdfmake.min.js"></script>
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.2.7/vfs_fonts.js"></script>
+	<style>
+		.logout-btn, .export-pdf-btn {
+			position: absolute;
+			top: 20px;
+			padding: 8px 15px;
+			border: none;
+			border-radius: 4px;
+			cursor: pointer;
+			font-size: 14px;
+			color: white;
+		}
+		.logout-btn {
+			right: 20px;
+			background: #f44336;
+		}
+		.logout-btn:hover {
+			background: #d32f2f;
+		}
+		.export-pdf-btn {
+			right: 150px;
+			background: #4CAF50;
+		}
+		.export-pdf-btn:hover {
+			background: #388E3C;
+		}
+		@media print {
+			.logout-btn, .export-pdf-btn {
+				display: none;
+			}
+		}
+	</style>
 	<script>
 		// Vérification de l'authentification
 		if (!sessionStorage.getItem('authenticated')) {
@@ -37,21 +70,6 @@
 		.lang-btn:focus {
 			background: #f2f2f2;
 		}
-		.logout-btn {
-			position: absolute;
-			top: 20px;
-			right: 20px;
-			padding: 8px 15px;
-			background: #f44336;
-			color: white;
-			border: none;
-			border-radius: 4px;
-			cursor: pointer;
-			font-size: 14px;
-		}
-		.logout-btn:hover {
-			background: #d32f2f;
-		}
 	</style>
 </head>
 
@@ -62,6 +80,7 @@
 
 		<header id="banner" role="banner" class="main-header clearfix">
 			<h1 class="main-title">Checklist UX-UI - Accessibilité</h1>
+			<button onclick="exportToPDF()" class="export-pdf-btn">Exporter en PDF</button>
 			<button onclick="logout()" class="logout-btn">Se déconnecter</button>
 		</header>
 
@@ -1002,7 +1021,6 @@
 
 				<section class="slide">
 					<h2>
-						
 						Prévoir un intitulé explicite pour chaque bouton de formulaire
 						- formulaires
 					</h2>
@@ -1307,7 +1325,7 @@
 					<figure
 						aria-label="Une couleur de police blanche aux contours noirs permet par exemple de garantir la lisibilité dans tous les contextes."
 						role="figure">
-						<img alt="Capture d'un lecteur vidéo, avec les sous-titres en blanc avec un contour noir."
+						<img alt="Capture d'un lecteur vidéo, les sous-titres en blanc avec un contour noir."
 							src="img_slide/sous-titres-02.jpg" />
 						<figcaption>
 							Une couleur de police blanche aux contours noirs permet par exemple de garantir la
@@ -1386,46 +1404,142 @@
 	<div id="Caudio"></div>
 	<div id="Dcourante" aria-live="polite" aria-atomic="true" aria-hidden="true"></div>
 
-	<script src="slide.js"></script>
-
-	<script src="afontgarde.js"></script>
-	<script>
-		AFontGarde('FontAwesome', '\uE600\uE601\uE602\uE605');
-
-
-		// Initialisation du compteur
-		let cpt = 1;
-
-		// Récupérer toutes les balises <section> avec la classe "slide", mais exclure "slide couv" et "slide end"
-		const sections = document.querySelectorAll('section.slide:not(.couv):not(.end)');
-
-		// Fonction pour formater le compteur avec un zéro si nécessaire
-		function formatCounter(count) {
-			return count < 10 ? `ID-0${count}` : `ID-${count}`;
-		}
-
-		// Parcourir chaque section
-		sections.forEach(section => {
-			// Trouver l'élément <h2> dans la section
-			const h2 = section.querySelector('h2');
-
-			// Si un <h2> est trouvé, ajouter l'ID avant le texte existant
-			if (h2) {
-				const formattedID = formatCounter(cpt); // Formater l'ID avec des zéros
-				h2.innerHTML = `${formattedID} ${h2.innerHTML}`; // Ajouter l'ID avant le texte existant
-				// Incrémenter le compteur
-				cpt++;
-			}
-		});
-
-
-	</script>
 	<script>
 		function logout() {
 			sessionStorage.removeItem('authenticated');
 			window.location.href = 'login.htm';
 		}
+
+		async function getImageDataUrl(imgElement) {
+			return new Promise((resolve, reject) => {
+				const canvas = document.createElement('canvas');
+				const ctx = canvas.getContext('2d');
+				const img = new Image();
+				img.crossOrigin = 'anonymous';
+				img.onload = () => {
+					canvas.width = img.width;
+					canvas.height = img.height;
+					ctx.drawImage(img, 0, 0);
+					resolve(canvas.toDataURL('image/jpeg'));
+				};
+				img.onerror = reject;
+				img.src = imgElement.src;
+			});
+		}
+
+		async function exportToPDF() {
+			// Message de chargement
+			const loadingMessage = document.createElement('div');
+			loadingMessage.style.position = 'fixed';
+			loadingMessage.style.top = '50%';
+			loadingMessage.style.left = '50%';
+			loadingMessage.style.transform = 'translate(-50%, -50%)';
+			loadingMessage.style.padding = '20px';
+			loadingMessage.style.background = 'rgba(0, 0, 0, 0.8)';
+			loadingMessage.style.color = 'white';
+			loadingMessage.style.borderRadius = '5px';
+			loadingMessage.style.zIndex = '9999';
+			loadingMessage.textContent = 'Génération du PDF accessible en cours...';
+			document.body.appendChild(loadingMessage);
+
+			try {
+				const docDefinition = {
+					info: {
+						title: 'Checklist UX-UI - Accessibilité',
+						author: 'TF1',
+						subject: 'Checklist accessibilité UX-UI',
+						keywords: 'accessibilité, UX, UI, checklist',
+						tagged: true // Active le balisage PDF/UA
+					},
+					content: [],
+					styles: {
+						header: {
+							fontSize: 24,
+							bold: true,
+							margin: [0, 0, 0, 10]
+						},
+						subheader: {
+							fontSize: 18,
+							bold: true,
+							margin: [0, 10, 0, 5]
+						},
+						paragraph: {
+							fontSize: 12,
+							margin: [0, 5, 0, 10]
+						},
+						figcaption: {
+							fontSize: 10,
+							italics: true,
+							margin: [0, 5, 0, 15]
+						}
+					}
+				};
+
+				// Ajouter le titre principal
+				docDefinition.content.push({
+					text: 'Checklist UX-UI - Accessibilité',
+					style: 'header',
+					headlineLevel: 1
+				});
+
+				// Parcourir toutes les sections
+				const sections = document.querySelectorAll('.slide');
+				for (const section of sections) {
+					const h2 = section.querySelector('h2');
+					if (h2) {
+						docDefinition.content.push({
+							text: h2.textContent.trim(),
+							style: 'subheader',
+							headlineLevel: 2,
+							pageBreak: 'before'
+						});
+					}
+
+					// Traiter les paragraphes
+					const paragraphs = section.querySelectorAll('p');
+					for (const p of paragraphs) {
+						docDefinition.content.push({
+							text: p.textContent.trim(),
+							style: 'paragraph'
+						});
+					}
+
+					// Traiter les images et leurs légendes
+					const figures = section.querySelectorAll('figure');
+					for (const figure of figures) {
+						const images = figure.querySelectorAll('img');
+						for (const img of images) {
+							try {
+								const dataUrl = await getImageDataUrl(img);
+								docDefinition.content.push({
+									image: dataUrl,
+									width: 400,
+									alt: img.alt || 'Image sans description'
+								});
+							} catch (error) {
+								console.error('Erreur lors du chargement de l\'image:', error);
+							}
+						}
+
+						const figcaption = figure.querySelector('figcaption');
+						if (figcaption) {
+							docDefinition.content.push({
+								text: figcaption.textContent.trim(),
+								style: 'figcaption'
+							});
+						}
+					}
+				}
+
+				// Générer le PDF avec les options d'accessibilité
+				pdfMake.createPdf(docDefinition).download('checklist-accessibilite-ux-ui.pdf');
+			} catch (error) {
+				console.error('Erreur lors de la génération du PDF:', error);
+				alert('Une erreur est survenue lors de la génération du PDF.');
+			} finally {
+				document.body.removeChild(loadingMessage);
+			}
+		}
 	</script>
 </body>
-
 </html>
