@@ -9,8 +9,6 @@
 	<link rel="stylesheet" id="currentCSS" href="css/themes/default.min.css" type="text/css" media="all">
 	<link rel="stylesheet" href="css/print.css" type="text/css" media="print">
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
-	<script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.2.7/pdfmake.min.js"></script>
-	<script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.2.7/vfs_fonts.js"></script>
 	<style>
 		.logout-btn, .export-pdf-btn {
 			position: absolute;
@@ -37,8 +35,55 @@
 			background: #388E3C;
 		}
 		@media print {
-			.logout-btn, .export-pdf-btn {
-				display: none;
+			.logout-btn, .export-pdf-btn, #nav, #setting {
+				display: none !important;
+			}
+			.slide {
+				page-break-before: always;
+				margin: 20px 0;
+			}
+			.slide:first-child {
+				page-break-before: avoid;
+			}
+			figure {
+				break-inside: avoid;
+				margin: 15px 0;
+			}
+			figcaption {
+				font-style: italic;
+				margin-top: 5px;
+			}
+			img {
+				max-width: 100%;
+				height: auto;
+			}
+			h2 {
+				font-size: 24px;
+				margin-bottom: 20px;
+			}
+			p {
+				margin-bottom: 10px;
+			}
+			/* Assurer que les images et leurs légendes restent ensemble */
+			figure {
+				display: flex;
+				flex-direction: column;
+				align-items: flex-start;
+				break-inside: avoid;
+			}
+			/* Améliorer la lisibilité */
+			body {
+				font-size: 12pt;
+				line-height: 1.5;
+			}
+			/* Assurer que les liens sont visibles */
+			a {
+				text-decoration: underline;
+				color: #000;
+			}
+			/* Ajout des URL des liens */
+			a[href^="http"]:after {
+				content: " (" attr(href) ")";
 			}
 		}
 	</style>
@@ -224,7 +269,6 @@
 						</figcaption>
 					</figure>
 				</section>
-
 
 				<section class="slide">
 					<h2>
@@ -1410,136 +1454,55 @@
 			window.location.href = 'login.htm';
 		}
 
-		async function getImageDataUrl(imgElement) {
-			return new Promise((resolve, reject) => {
-				const canvas = document.createElement('canvas');
-				const ctx = canvas.getContext('2d');
-				const img = new Image();
-				img.crossOrigin = 'anonymous';
-				img.onload = () => {
-					canvas.width = img.width;
-					canvas.height = img.height;
-					ctx.drawImage(img, 0, 0);
-					resolve(canvas.toDataURL('image/jpeg'));
-				};
-				img.onerror = reject;
-				img.src = imgElement.src;
-			});
+		function exportToPDF() {
+			// Ajouter un message pour l'utilisateur
+			const message = document.createElement('div');
+			message.style.position = 'fixed';
+			message.style.top = '50%';
+			message.style.left = '50%';
+			message.style.transform = 'translate(-50%, -50%)';
+			message.style.padding = '20px';
+			message.style.background = 'rgba(0, 0, 0, 0.8)';
+			message.style.color = 'white';
+			message.style.borderRadius = '5px';
+			message.style.zIndex = '9999';
+			message.textContent = 'La fenêtre d\'impression va s\'ouvrir. Choisissez "Enregistrer au format PDF" comme destination.';
+			document.body.appendChild(message);
+
+			// Retirer le message après 3 secondes
+			setTimeout(() => {
+				document.body.removeChild(message);
+				window.print();
+			}, 3000);
 		}
+	</script>
+	<script>
+		document.addEventListener('DOMContentLoaded', function() {
+			// Get all sections
+			const sections = document.querySelectorAll('section');
+			let recoNumber = 1;
 
-		async function exportToPDF() {
-			// Message de chargement
-			const loadingMessage = document.createElement('div');
-			loadingMessage.style.position = 'fixed';
-			loadingMessage.style.top = '50%';
-			loadingMessage.style.left = '50%';
-			loadingMessage.style.transform = 'translate(-50%, -50%)';
-			loadingMessage.style.padding = '20px';
-			loadingMessage.style.background = 'rgba(0, 0, 0, 0.8)';
-			loadingMessage.style.color = 'white';
-			loadingMessage.style.borderRadius = '5px';
-			loadingMessage.style.zIndex = '9999';
-			loadingMessage.textContent = 'Génération du PDF accessible en cours...';
-			document.body.appendChild(loadingMessage);
-
-			try {
-				const docDefinition = {
-					info: {
-						title: 'Checklist UX-UI - Accessibilité',
-						author: 'TF1',
-						subject: 'Checklist accessibilité UX-UI',
-						keywords: 'accessibilité, UX, UI, checklist',
-						tagged: true // Active le balisage PDF/UA
-					},
-					content: [],
-					styles: {
-						header: {
-							fontSize: 24,
-							bold: true,
-							margin: [0, 0, 0, 10]
-						},
-						subheader: {
-							fontSize: 18,
-							bold: true,
-							margin: [0, 10, 0, 5]
-						},
-						paragraph: {
-							fontSize: 12,
-							margin: [0, 5, 0, 10]
-						},
-						figcaption: {
-							fontSize: 10,
-							italics: true,
-							margin: [0, 5, 0, 15]
-						}
-					}
-				};
-
-				// Ajouter le titre principal
-				docDefinition.content.push({
-					text: 'Checklist UX-UI - Accessibilité',
-					style: 'header',
-					headlineLevel: 1
-				});
-
-				// Parcourir toutes les sections
-				const sections = document.querySelectorAll('.slide');
-				for (const section of sections) {
+			sections.forEach(section => {
+				// Check if the section has exactly the class "slide" (no additional classes)
+				if (section.classList.length === 1 && section.classList.contains('slide')) {
 					const h2 = section.querySelector('h2');
 					if (h2) {
-						docDefinition.content.push({
-							text: h2.textContent.trim(),
-							style: 'subheader',
-							headlineLevel: 2,
-							pageBreak: 'before'
-						});
-					}
-
-					// Traiter les paragraphes
-					const paragraphs = section.querySelectorAll('p');
-					for (const p of paragraphs) {
-						docDefinition.content.push({
-							text: p.textContent.trim(),
-							style: 'paragraph'
-						});
-					}
-
-					// Traiter les images et leurs légendes
-					const figures = section.querySelectorAll('figure');
-					for (const figure of figures) {
-						const images = figure.querySelectorAll('img');
-						for (const img of images) {
-							try {
-								const dataUrl = await getImageDataUrl(img);
-								docDefinition.content.push({
-									image: dataUrl,
-									width: 400,
-									alt: img.alt || 'Image sans description'
-								});
-							} catch (error) {
-								console.error('Erreur lors du chargement de l\'image:', error);
-							}
+						// Format the recommendation number with leading zero
+						const recoId = `reco-${String(recoNumber).padStart(2, '0')}`;
+						
+						// Get the current HTML content
+						const currentContent = h2.innerHTML.trim();
+						
+						// Only add the reco number if it's not already there
+						if (!currentContent.includes('reco-')) {
+							h2.innerHTML = `${recoId} - ${currentContent}`;
 						}
-
-						const figcaption = figure.querySelector('figcaption');
-						if (figcaption) {
-							docDefinition.content.push({
-								text: figcaption.textContent.trim(),
-								style: 'figcaption'
-							});
-						}
+						
+						recoNumber++;
 					}
 				}
-
-				// Générer le PDF avec les options d'accessibilité
-				pdfMake.createPdf(docDefinition).download('checklist-accessibilite-ux-ui.pdf');
-			} catch (error) {
-				console.error('Erreur lors de la génération du PDF:', error);
-				alert('Une erreur est survenue lors de la génération du PDF.');
-			} finally {
-				document.body.removeChild(loadingMessage);
-			}
-		}
+			});
+		});
 	</script>
 </body>
 </html>
