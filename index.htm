@@ -1478,28 +1478,30 @@
 	</script>
 	<script>
 		document.addEventListener('DOMContentLoaded', function() {
-			// Get all sections
-			const sections = document.querySelectorAll('section');
+			// Get all slides
+			const slides = document.querySelectorAll('.slide');
 			let recoNumber = 1;
 
-			sections.forEach(section => {
-				// Check if the section has exactly the class "slide" (no additional classes)
-				if (section.classList.length === 1 && section.classList.contains('slide')) {
-					const h2 = section.querySelector('h2');
-					if (h2) {
-						// Format the recommendation number with leading zero
-						const recoId = `reco-${String(recoNumber).padStart(2, '0')}`;
-						
-						// Get the current HTML content
-						const currentContent = h2.innerHTML.trim();
-						
-						// Only add the reco number if it's not already there
-						if (!currentContent.includes('reco-')) {
-							h2.innerHTML = `${recoId} - ${currentContent}`;
-						}
-						
-						recoNumber++;
+			slides.forEach(slide => {
+				// Skip slides with class "couv" or "end"
+				if (slide.classList.contains('couv') || slide.classList.contains('end')) {
+					return;
+				}
+
+				const h2 = slide.querySelector('h2');
+				if (h2) {
+					// Format the recommendation number with leading zero
+					const recoId = `reco-${String(recoNumber).padStart(2, '0')}`;
+					
+					// Get the current HTML content
+					const currentContent = h2.innerHTML.trim();
+					
+					// Only add the reco number if it's not already there
+					if (!currentContent.includes('reco-')) {
+						h2.innerHTML = `${recoId} - ${currentContent}`;
 					}
+					
+					recoNumber++;
 				}
 			});
 		});

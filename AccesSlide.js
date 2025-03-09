@@ -288,7 +288,7 @@ var config = {
 		classHelpSetting: 'help',
 		classLabelSetting: 'label-setting setting-plan',
 		IconClass: 'icon icon-setting-plan',		
-		val: 1,   // Changed from 0 to 1 to make it checked by default
+		val: 0,   
 		group: 'Gslide' 
 	},
 	/** Misceallanous **/
